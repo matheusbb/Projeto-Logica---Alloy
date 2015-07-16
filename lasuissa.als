@@ -7,8 +7,8 @@ sig Bebida{
 }
 
 sig Pedido{
-	 comidas : set Comida
-	 //bebidas : set Bebida
+	 comidas : set Comida,
+	 bebidas : set Bebida
 }
 
 sig Salgado extends Comida{

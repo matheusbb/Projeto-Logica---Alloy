@@ -1,4 +1,4 @@
-module lasuissa
+mmodule lasuissa
 
 sig Cliente{
 	pedido : set Pedido
@@ -41,7 +41,16 @@ sig Brigadeiro extends Sobremesa{}
 
 sig PedidoConvencional extends Pedido{}
 sig Pacote extends Pedido {}
+fact Cliente{
+all c:Cliente| #c.pedido = 1
+all p:Pedido| p in Cliente.pedido
 
+}
+
+fact Pacote{
+all p:Pacote |some p.comidas 
+all p:Pacote| some p.bebidas
+}
 pred show[]{}
 run show 
 

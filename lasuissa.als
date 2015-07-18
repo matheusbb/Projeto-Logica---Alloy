@@ -1,30 +1,46 @@
 module lasuissa
 
-sig Comida{
+sig Cliente{
+	pedido : set Pedido
 }
 
-sig Bebida{
+abstract sig Comida{
 }
 
-sig Pedido{
+abstract sig Bebida{
+}
+
+abstract sig Pedido{
 	 comidas : set Comida,
 	 bebidas : set Bebida
 }
 
-sig Salgado extends Comida{
+abstract sig Salgado extends Comida{
 }
 
-sig Sanduiche extends Comida{
+abstract sig Sanduiche extends Comida{
 }
 
-sig Sobremesa extends Comida {
+abstract sig Sobremesa extends Comida {
 }
 
-sig PedidoConvencional extends Pedido{
-}
+sig Agua extends Bebida{}
+sig Refrigerante extends Bebida{}
+sig Suco extends Bebida{}
 
-sig Pacote extends Pedido {
-}
+sig Coxinha extends Salgado{}
+sig Empada extends Salgado{}
+sig Pastel extends Salgado{}
+
+sig SanduicheFrango extends Sanduiche{}
+sig SanduicheAtum extends Sanduiche{}
+
+sig Pudim extends Sobremesa{}
+sig Torta extends Sobremesa{}
+sig Brigadeiro extends Sobremesa{}
+
+sig PedidoConvencional extends Pedido{}
+sig Pacote extends Pedido {}
 
 pred show[]{}
 run show 

@@ -46,7 +46,10 @@ all c:Cliente| #c.pedido = 1
 all p:Pedido| p in Cliente.pedido
 
 }
-
+fact pedido{
+all c: Comida| c in Pedido.comidas
+all b: Bebida| b in Pedido.bebidas
+}
 fact Pacote{
 all p:Pacote |some p.comidas 
 all p:Pacote| some p.bebidas

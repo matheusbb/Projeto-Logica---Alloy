@@ -1,4 +1,4 @@
-mmodule lasuissa
+module lasuissa
 
 sig Cliente{
 	pedido : set Pedido

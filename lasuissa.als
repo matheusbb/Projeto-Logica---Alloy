@@ -16,14 +16,11 @@ abstract sig Pedido{
 	 bebidas : set Bebida
 }
 
-abstract sig Salgado extends Comida{
-}
+abstract sig Salgado extends Comida{}
 
-abstract sig Sanduiche extends Comida{
-}
+abstract sig Sanduiche extends Comida{}
 
-abstract sig Sobremesa extends Comida {
-}
+abstract sig Sobremesa extends Comida {}
 
 sig Agua extends Bebida{}
 sig Refrigerante extends Bebida{}
@@ -53,14 +50,21 @@ fact Pedido{
 	all comida: Comida| comida in Pedido.comidas
 	all bebida: Bebida| bebida in Pedido.bebidas
 	
-	all p1 : PacoteUm | (#(numSalgados[p1]) > 1 or #(numSalgados[p1]) > 1)
- 	and ((p1.bebidas in Suco) and (some p1.bebidas) 
- 	or (p1.bebidas in Refrigerante) and (some p1.bebidas))
+	all p : Pedido | (some p.bebidas) or (some p.comidas)
+
+	all p1 : PacoteUm | (#(numSalgados[p1]) > 1 or #(numSanduiche[p1]) > 1 or #(numSobremesas[p1]) > 1)
+ 	and (some sucos[p1] or some refrigerantes[p1])
+
+	all p2 : PacoteDois | (#(numSalgados[p2]) > 1 and (some numSanduiche[p2] or some numSobremesas[p2])) 
+ 	or (#(numSanduiche[p2]) > 1 and (some numSalgados[p2] or some numSobremesas[p2]))
+ 	or (#(numSobremesas[p2]) > 1 and (some numSalgados[p2] or some numSanduiche[p2]))
+ 	and (some refrigerantes[p2])
 }
 
 fact Estoque { 
-	all lanchonete:Lanchonete,  coxinha:Coxinha, pastel:Pastel, empada:Empada |
- 	#((((lanchonete.clientes).pedidos).comidas) & (coxinha + pastel + empada)) = 14
+	all coxinha:Coxinha, pastel:Pastel, empada:Empada | #(coxinha + pastel + empada) = 14
+ 	--all lanchonete:Lanchonete,  coxinha:Coxinha, pastel:Pastel, empada:Empada |
+ 	--#((((lanchonete.clientes).pedidos).comidas) & (coxinha + pastel + empada)) = 14
 }
 
 fun numSalgados[p: Pedido] : set Comida {
@@ -70,6 +74,24 @@ fun numSalgados[p: Pedido] : set Comida {
 fun numSanduiche[p: Pedido] : set Comida {
  	(p.comidas & (SanduicheAtum + SanduicheFrango))
 }
+
+fun numSobremesas[p: Pedido] : set Comida {
+ 	(p.comidas & (Pudim + Torta + Brigadeiro))
+}
+
+fun sucos[p: Pedido] : set Suco {
+ 	(p.bebidas & Suco)
+}
+
+fun refrigerantes[p: Pedido] : set Refrigerante {
+ 	(p.bebidas & Refrigerante)
+}
+
+assert pedidoTemBebidaOuComida{
+	all p: Pedido | #(p.bebidas + p.comidas) >= 1
+}
+
+check pedidoTemBebidaOuComida for 10
 
 pred show[]{}
 run show for 7 but exactly 7 Cliente

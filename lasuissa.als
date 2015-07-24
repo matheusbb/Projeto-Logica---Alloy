@@ -1,14 +1,15 @@
 module lasuissa
 
-sig Cliente{
-	pedido : set Pedido
+one sig Lanchonete {
+	clientes : set Cliente
+}
+sig Cliente {
+	pedidos : set Pedido
 }
 
-abstract sig Comida{
-}
+abstract sig Comida{}
 
-abstract sig Bebida{
-}
+abstract sig Bebida{}
 
 abstract sig Pedido{
 	 comidas : set Comida,
@@ -40,21 +41,35 @@ sig Torta extends Sobremesa{}
 sig Brigadeiro extends Sobremesa{}
 
 sig PedidoConvencional extends Pedido{}
-sig Pacote extends Pedido {}
+sig PacoteUm extends Pedido {}
+sig PacoteDois extends Pedido {}
+
 fact Cliente{
-all c:Cliente| #c.pedido = 1
-all p:Pedido| p in Cliente.pedido
+	all cliente: Cliente| some cliente.pedidos and cliente in Lanchonete.clientes
+	all pedido: Pedido| pedido in Cliente.pedidos
+}
 
+fact Pedido{
+	all comida: Comida| comida in Pedido.comidas
+	all bebida: Bebida| bebida in Pedido.bebidas
+	
+	all p1 : PacoteUm | (#(numSalgados[p1]) > 1 or #(numSalgados[p1]) > 1)
+ 	and ((p1.bebidas in Suco) and (some p1.bebidas) 
+ 	or (p1.bebidas in Refrigerante) and (some p1.bebidas))
 }
-fact pedido{
-all c: Comida| c in Pedido.comidas
-all b: Bebida| b in Pedido.bebidas
+
+fact Estoque { 
+	all lanchonete:Lanchonete,  coxinha:Coxinha, pastel:Pastel, empada:Empada |
+ 	#((((lanchonete.clientes).pedidos).comidas) & (coxinha + pastel + empada)) = 14
 }
-fact Pacote{
-all p:Pacote |some p.comidas 
-all p:Pacote| some p.bebidas
+
+fun numSalgados[p: Pedido] : set Comida {
+ 	(p.comidas & (Coxinha + Pastel + Empada))
 }
+
+fun numSanduiche[p: Pedido] : set Comida {
+ 	(p.comidas & (SanduicheAtum + SanduicheFrango))
+}
+
 pred show[]{}
-run show 
-
-
+run show for 7 but exactly 7 Cliente

@@ -62,7 +62,7 @@ fact Pedido{
 }
 
 fact Estoque { 
-	all coxinha:Coxinha, pastel:Pastel, empada:Empada | #(coxinha + pastel + empada) = 14
+	#Salgado <= 14
  	--all lanchonete:Lanchonete,  coxinha:Coxinha, pastel:Pastel, empada:Empada |
  	--#((((lanchonete.clientes).pedidos).comidas) & (coxinha + pastel + empada)) = 14
 }
@@ -88,10 +88,10 @@ fun refrigerantes[p: Pedido] : set Refrigerante {
 }
 
 assert pedidoTemBebidaOuComida{
-	all p: Pedido | #(p.bebidas + p.comidas) >= 1
+	all p: Pedido | #p.bebidas >= 1 or #p.comidas >= 1
 }
 
-check pedidoTemBebidaOuComida for 10
+//check pedidoTemBebidaOuComida for 100
 
 pred show[]{}
 run show for 7 but exactly 7 Cliente

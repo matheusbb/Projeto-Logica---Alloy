@@ -4,7 +4,7 @@ one sig Lanchonete {
 	clientes : set Cliente
 }
 sig Cliente {
-	pedidos : set Pedido
+	pedidos : one Pedido
 }
 
 abstract sig Comida{}
@@ -88,10 +88,12 @@ fun refrigerantes[p: Pedido] : set Refrigerante {
 }
 
 assert pedidoTemBebidaOuComida{
-	all p: Pedido | #p.bebidas >= 1 or #p.comidas >= 1
+	 -- all p: Pedido | #p.bebidas >= 1 or #p.comidas >= 1
+!some p: Pedido | no p.bebidas and no p.comidas 
 }
 
-//check pedidoTemBebidaOuComida for 100
+check pedidoTemBebidaOuComida for 100
 
 pred show[]{}
 run show for 7 but exactly 7 Cliente
+

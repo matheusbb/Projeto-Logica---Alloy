@@ -92,6 +92,21 @@ assert pedidoTemBebidaOuComida{
 !some p: Pedido | no p.bebidas and no p.comidas 
 }
 
+assert pacoteUM{
+	!some p: PacoteUm | no sucos[p] and no refrigerantes[p] and 
+	#(numSalgados[p]) < 2 and #(numSanduiche[p]) < 2 and #(numSobremesas[p]) < 2
+
+}
+
+assert pacoteDOIS{
+	!some p:PacoteDois | no refrigerantes[p]
+
+}
+
+check pacoteDOIS for 70
+
+check pacoteUM for 70
+
 check pedidoTemBebidaOuComida for 100
 
 pred show[]{}

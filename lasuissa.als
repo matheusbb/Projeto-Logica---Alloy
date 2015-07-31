@@ -88,44 +88,25 @@ fun refrigerantes[p: Pedido] : set Refrigerante {
 }
 
 assert pedidoTemBebidaOuComida{
-<<<<<<< HEAD
 	!some p: Pedido | no p.bebidas and no p.comidas 
 }
 
 assert pacoteUm{
-=======
-	 -- all p: Pedido | #p.bebidas >= 1 or #p.comidas >= 1
-!some p: Pedido | no p.bebidas and no p.comidas 
-}
-
-assert pacoteUM{
->>>>>>> 448c54adcec8c35e1e1b544f13171e3fae717cf7
 	!some p: PacoteUm | no sucos[p] and no refrigerantes[p] and 
 	#(numSalgados[p]) < 2 and #(numSanduiche[p]) < 2 and #(numSobremesas[p]) < 2
 
 }
 
-<<<<<<< HEAD
 assert pacoteDois{
-=======
-assert pacoteDOIS{
->>>>>>> 448c54adcec8c35e1e1b544f13171e3fae717cf7
 	!some p:PacoteDois | no refrigerantes[p]
 
 }
 
-<<<<<<< HEAD
 check pacoteDois for 70
 
 check pacoteUm for 70
-=======
-check pacoteDOIS for 70
-
-check pacoteUM for 70
->>>>>>> 448c54adcec8c35e1e1b544f13171e3fae717cf7
 
 check pedidoTemBebidaOuComida for 100
 
 pred show[]{}
 run show for 7 but exactly 7 Cliente
-

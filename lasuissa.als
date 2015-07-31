@@ -1,25 +1,25 @@
 module lasuissa
 
+open util/ordering[Time]
+
+sig Time {}
+
 one sig Lanchonete {
 	clientes : set Cliente
 }
 sig Cliente {
-	pedidos : set Pedido
+	pedidos : one Pedido
 }
 
 abstract sig Comida{}
-
 abstract sig Bebida{}
-
 abstract sig Pedido{
 	 comidas : set Comida,
 	 bebidas : set Bebida
 }
 
 abstract sig Salgado extends Comida{}
-
 abstract sig Sanduiche extends Comida{}
-
 abstract sig Sobremesa extends Comida {}
 
 sig Agua extends Bebida{}
@@ -62,7 +62,7 @@ fact Pedido{
 }
 
 fact Estoque { 
-	all coxinha:Coxinha, pastel:Pastel, empada:Empada | #(coxinha + pastel + empada) = 14
+	#Salgado <= 14
  	--all lanchonete:Lanchonete,  coxinha:Coxinha, pastel:Pastel, empada:Empada |
  	--#((((lanchonete.clientes).pedidos).comidas) & (coxinha + pastel + empada)) = 14
 }
@@ -88,10 +88,26 @@ fun refrigerantes[p: Pedido] : set Refrigerante {
 }
 
 assert pedidoTemBebidaOuComida{
-	all p: Pedido | #(p.bebidas + p.comidas) >= 1
+	!some p: Pedido | no p.bebidas and no p.comidas 
 }
 
-check pedidoTemBebidaOuComida for 10
+assert pacoteUm{
+	!some p: PacoteUm | no sucos[p] and no refrigerantes[p] and 
+	#(numSalgados[p]) < 2 and #(numSanduiche[p]) < 2 and #(numSobremesas[p]) < 2
+
+}
+
+assert pacoteDois{
+	!some p:PacoteDois | no refrigerantes[p]
+
+}
+
+check pacoteDois for 70
+
+check pacoteUm for 70
+
+check pedidoTemBebidaOuComida for 100
 
 pred show[]{}
 run show for 7 but exactly 7 Cliente
+

@@ -56,9 +56,9 @@ fact Pedido{
 
 	all p : Pedido, t: Time-first | (some (p.bebidas).t) or (some (p.comidas).t)
 
-	all p1 : PacoteUm, t: Time | isPacoteUm[p1,t]
+	all p1 : PacoteUm, t: Time-first, a: Agua| isPacoteUm[p1,t] and (a !in (p1.bebidas).t)
 	
-	all p2 : PacoteDois, t: Time | isPacoteDois[p2,t]
+	all p2 : PacoteDois, t: Time-first, a: Agua, s: Suco | isPacoteDois[p2,t] and (s !in (p2.bebidas).t) and (a !in (p2.bebidas).t)
 }
 
 fact Estoque {
@@ -71,11 +71,12 @@ fact Estoque {
 fact traces {
 	init[first]
 	all pre: Time-last| let pos = pre.next|
- 	some  c: Cliente, p: Pedido, c1: Comida, b:Bebida, s: Sobremesa |
+ 	some  c: Cliente, p: Pedido, c1: Comida, b:Bebida|
 	addPedidoCliente[c,p, pre, pos] and
 	addComidaPedido[p,c1,pre,pos] and 
-	addBebidaPedido[p,b,pre,pos] and
-	addSobremesaPacoteUm[p,s,pre,pos]
+	addBebidaPedido[p,b,pre,pos] 
+	--addSobremesaPacoteUm[p,s,pre,pos] and
+   --addSobremesaPacoteDois[p,s,pre,pos]
 }
 
 fun numSalgados[p: Pedido, t: Time] : set Comida {
@@ -98,41 +99,28 @@ fun refrigerantes[p: Pedido, t: Time] : set Refrigerante {
  	((p.bebidas).t & Refrigerante)
 }
 
-assert pedidoTemBebidaOuComida{
-	!some p: Pedido | no p.bebidas and no p.comidas 
-}
 
-assert pacoteUm{
-	!some p: PacoteUm, t: Time| no sucos[p,t] and no refrigerantes[p,t] and 
-	#(numSalgados[p,t]) < 2 and #(numSanduiche[p,t]) < 2 and #(numSobremesas[p,t]) < 2
-}
-
-assert pacoteDois{
-	!some p: PacoteDois, t: Time | no refrigerantes[p,t]
-}
-
-assert noPedidoSemCliente {
-	!some p: Pedido| all t: Time | (all c: Cliente | p !in (c.pedidos).t) 
-}
 
 pred init[t: Time]{
 	all c: Cliente | no (c.pedidos).t
 	all p: Pedido  | no (p.comidas).t and no (p.bebidas).t
+   all p1: PacoteUm | (Agua !in (p1.bebidas).t)
+   all p2: PacoteDois | (Suco !in (p2.bebidas).t) and (Agua !in (p2.bebidas).t)
 }
 
 pred isPacoteUm[p1:PacoteUm, t: Time]{
 	(#(numSalgados[p1,t]) > 1 or #(numSanduiche[p1,t]) > 1 or #(numSobremesas[p1,t]) > 1)
- 	and (some sucos[p1,t] or some refrigerantes[p1,t])
+ 	and (some sucos[p1,t] or some refrigerantes[p1,t]) and (Agua !in (p1.bebidas).t)
 }
 
 pred isPacoteDois[p2: PacoteDois, t:Time]{
 	(#(numSalgados[p2,t]) > 1 and (some numSanduiche[p2,t] or some numSobremesas[p2,t])) 
  	or (#(numSanduiche[p2,t]) > 1 and (some numSalgados[p2,t] or some numSobremesas[p2,t]))
  	or (#(numSobremesas[p2,t]) > 1 and (some numSalgados[p2,t] or some numSanduiche[p2,t]))
- 	and (some refrigerantes[p2,t])
+ 	and (some refrigerantes[p2,t]) and (Suco !in (p2.bebidas).t) and (Agua !in (p2.bebidas).t)
 }
 
-pred addPedidoCliente[ c: Cliente, p: Pedido, antes , depois: Time]{
+pred addPedidoCliente[c: Cliente, p: Pedido, antes , depois: Time]{
 	(p !in (c.pedidos).antes)
 	(c.pedidos).depois = (c.pedidos).antes + p 
 }
@@ -151,7 +139,27 @@ pred addSobremesaPacoteUm[p: Pedido , s: Sobremesa, antes, depois: Time ]{
 	isPacoteUm[p,antes] and (s != Torta)
 	(p.comidas).depois = (p.comidas).antes + s
 }
+pred addSobremesaPacoteDois[p: Pedido , s: Sobremesa, antes, depois: Time ]{
+	isPacoteDois[p,antes] and ((s != Pudim) or (s != Brigadeiro))
+	(p.comidas).depois = (p.comidas).antes + s
+}
 
+assert pedidoTemBebidaOuComida{
+	!some p: Pedido | no p.bebidas and no p.comidas 
+}
+
+assert pacoteUm{
+	!some p: PacoteUm, t: Time| no sucos[p,t] and no refrigerantes[p,t] and 
+	#(numSalgados[p,t]) < 2 and #(numSanduiche[p,t]) < 2 and #(numSobremesas[p,t]) < 2
+}
+
+assert pacoteDois{
+	!some p: PacoteDois, t: Time | no refrigerantes[p,t]
+}
+
+assert noPedidoSemCliente {
+	!some p: Pedido| all t: Time | (all c: Cliente | p !in (c.pedidos).t) 
+}
 --check noPedidoSemCliente for 20
 
 --check pacoteDois for 30
@@ -162,3 +170,4 @@ pred addSobremesaPacoteUm[p: Pedido , s: Sobremesa, antes, depois: Time ]{
 
 pred show[]{}
 run show for 20 but exactly 7 Cliente
+

@@ -64,7 +64,7 @@ fact Pedido{
 	// Verifica se eh pacote um  
 	all p1 : PacoteUm, t: Time-first | isPacoteUm[p1,t]
 	// Verifica se eh pacote dois
-	all p2 : PacoteDois, t: Time-first | isPacoteDois[p2,t]
+	all p2 : PacoteDois, t: Time-first | isPacoteDois[p2,t] and Refrigerante in (p2.bebidas).t
 
 }
 
@@ -75,7 +75,11 @@ fact Estoque {
 	#Salgado <= 14
 	#Sanduiche <= 14
 	#Bebida <= 10
+	#Refrigerante >= 1
 	#Sobremesa <= 7
+	#Pudim >= 1
+	#Torta >= 1
+	#Brigadeiro >= 1
 }
 
 fact traces {
@@ -202,7 +206,7 @@ assert pacoteDois{
 	/*
 	* Procura um pacote dois que nao atende as especificaçao do pacote
 	*/
-	!some p: PacoteDois, t: Time-first | no getRefrigerantes[p,t]
+	!some p: PacoteDois, t: Time-first | no getRefrigerantes[p,t] and !( (#(getSalgados[p,t]) < 2 and #(getSanduiche[p,t]) < 2))
 }
 
 assert noPedidoSemCliente {
@@ -214,13 +218,13 @@ assert noPedidoSemCliente {
 
 -------------------------- CHECK'S --------------------------
 
---check noPedidoSemCliente for 20
+check noPedidoSemCliente for 20
 
---check pacoteDois for 30
+check pacoteDois for 20
 
---check pacoteUm for 20
+check pacoteUm for 20
 
---check pedidoTemBebidaOuComida for 20
+check pedidoTemBebidaOuComida for 20
 
 pred show[]{}
 run show for 7 but exactly 7 Cliente

@@ -76,9 +76,6 @@ fact Estoque {
 	#Sanduiche <= 14
 	#Bebida <= 10
 	#Sobremesa <= 7
-	#Pudim >= 1
-	#Torta >= 1
-	#Brigadeiro >= 1
 }
 
 fact traces {
@@ -87,7 +84,7 @@ fact traces {
 	*/
 	init[first]
 	all pre: Time-last| let pos = pre.next|
- 	some  c: Cliente, p: Pedido, c1: Comida, b:Bebida, s: Sobremesa, t: Torta|
+ 	some  c: Cliente, p: Pedido, c1: Comida, b:Bebida, s: Sobremesa,t:Torta|
 	addPedidoCliente[c,p, pre, pos] and
 	addComidaPedido[p,c1,pre,pos] and 
 	addBebidaPedido[p,b,pre,pos] and
@@ -149,7 +146,7 @@ pred addPedidoCliente[c: Cliente, p: Pedido, antes , depois: Time]{
 	/*
 	* Adiciona pedido ao cliente caso ele nao o tenha
 	*/
-	(p !in (c.pedidos).antes) and (!some c1: Cliente | p in (c1.pedidos).antes)	
+	(p !in (c.pedidos).antes)
 	(c.pedidos).depois = (c.pedidos).antes + p 
 }
 
